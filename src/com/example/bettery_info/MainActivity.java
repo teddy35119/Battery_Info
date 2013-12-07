@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 	// String percent = "",volt="",current="",tempTV="",charge="",USB="";
 	// double tempTVnum,voltnum,currentnum;
 	
-	//Timer³]¸m
+	//Timerè¨­ç½®
 	TimerTask infomation_updater = new TimerTask(){
 		@Override
 		public void run() {
@@ -49,14 +49,14 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		viewinit();
-		displayBatteryInfomation(infoListener());    //­º¦¸§ì¨ú¼Æ¾Ú ¨ÃÅã¥Ü¸ê°T
+		displayBatteryInfomation(infoListener());    //é¦–æ¬¡æŠ“å–æ•¸æ“š ä¸¦é¡¯ç¤ºè³‡è¨Š
 		Timer timer = new Timer();
 		timer.schedule(infomation_updater, 1000,1000);	
 	}
 	
 	
 	
-	private void viewinit(){   //ªì©l¤Æ¤¶­±
+	private void viewinit(){   //åˆå§‹åŒ–ä»‹é¢
 		percentTextView = (TextView)findViewById(R.id.textView_info_percent);
 		voltTextView = (TextView)findViewById(R.id.textView_info_volt);
 		currentTextView = (TextView)findViewById(R.id.textView_info_current);
@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 		percentTextView.setText(battery_infomation.get("percent")+"%");
 		voltTextView.setText(battery_infomation.get("voltnum")+"mV");
 		currentTextView.setText(battery_infomation.get("currentnum")+"mA");
-		tempTextView.setText(battery_infomation.get("tempTVnum")+"«×");
+		tempTextView.setText(battery_infomation.get("tempTVnum")+"åº¦");
 		chargeTextView.setText(battery_infomation.get("charge")+"");
 		USBTextView.setText(battery_infomation.get("USB")+"");
 	}
