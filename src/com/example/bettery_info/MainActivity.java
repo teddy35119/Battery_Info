@@ -124,6 +124,7 @@ public class MainActivity extends Activity {
 				//mBluetoothAdapter.enable();
 				
 				br.close();
+				f.close();
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
