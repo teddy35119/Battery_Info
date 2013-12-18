@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.R.string;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
