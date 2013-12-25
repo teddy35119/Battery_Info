@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.R.string;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -17,6 +18,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -24,11 +26,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
-	Button resetButton;
+	Button imageIntentButton,bgButton;
 	TextView percentTextView,voltTextView,currentTextView,tempTextView,chargeTextView,USBTextView;
-	
-	// String percent = "",volt="",current="",tempTV="",charge="",USB="";
-	// double tempTVnum,voltnum,currentnum;
 	
 	//Timer設置
 	TimerTask infomation_updater = new TimerTask(){
@@ -51,11 +50,10 @@ public class MainActivity extends Activity {
 		viewinit();
 		displayBatteryInfomation(infoListener());    //首次抓取數據 並顯示資訊
 		Timer timer = new Timer();
-		timer.schedule(infomation_updater, 1000,1000);	
+		timer.schedule(infomation_updater, 1000,1000);
+		imageIntentButton.setOnClickListener(ImageIntentButtonListener);
 	}
-	
-	
-	
+		
 	private void viewinit(){   //初始化介面
 		percentTextView = (TextView)findViewById(R.id.textView_info_percent);
 		voltTextView = (TextView)findViewById(R.id.textView_info_volt);
@@ -63,16 +61,44 @@ public class MainActivity extends Activity {
 		tempTextView = (TextView)findViewById(R.id.textView_info_temp);
 		chargeTextView = (TextView)findViewById(R.id.textView_info_charge);
 		USBTextView = (TextView)findViewById(R.id.textView_info_USB);
+		imageIntentButton = (Button)findViewById(R.id.button_info_image);
+		bgButton = (Button)findViewById(R.id.button_info_bg);
 	}
 	
 	
+	
 	private void displayBatteryInfomation(HashMap<String,String> battery_infomation){
+		double tempnum = Double.parseDouble(battery_infomation.get("temp"));
+		tempnum/=10;
+		if(tempnum<=30){
+			tempTextView.setTextColor(Color.GREEN);
+		}else if(tempnum>30&&tempnum<40){
+			tempTextView.setTextColor(Color.YELLOW);
+		}else{
+			tempTextView.setTextColor(Color.RED);
+		}
+		double voltnum = Double.parseDouble(battery_infomation.get("volt"));
+		voltnum/=1000;
+		double currentnum = Double.parseDouble(battery_infomation.get("current"));
+		currentnum/=1000;
+		String chargenum="";
+		String USBnum="";
+		if("1".equals(battery_infomation.get("charge"))){
+			chargenum="充電中";
+		}else{
+			chargenum="未充電";
+		}
+		if("1".equals(battery_infomation.get("USB"))){
+			USBnum="未連接USB";
+		}else{
+			USBnum="USB連接中";
+		}
 		percentTextView.setText(battery_infomation.get("percent")+"%");
-		voltTextView.setText(battery_infomation.get("voltnum")+"mV");
-		currentTextView.setText(battery_infomation.get("currentnum")+"mA");
-		tempTextView.setText(battery_infomation.get("tempTVnum")+"度");
-		chargeTextView.setText(battery_infomation.get("charge")+"");
-		USBTextView.setText(battery_infomation.get("USB")+"");
+		voltTextView.setText(voltnum+"mV");
+		currentTextView.setText(currentnum+"mA");
+		tempTextView.setText(tempnum+"度");
+		chargeTextView.setText(chargenum+"");
+		USBTextView.setText(USBnum+"");
 	}
 
 	
@@ -87,11 +113,10 @@ public class MainActivity extends Activity {
 			{
 				f = new FileReader(file_name);
 				BufferedReader br = new BufferedReader(f);
-				String temp = "", Allline=""; //what allline do?
+				String temp = "";
 				temp = br.readLine();					
 				while(temp != null)
 				{
-					Allline += temp + "\n";
 					temp = br.readLine();
 					if(temp.indexOf("Percentage(%)") >= 0)
 					{
@@ -107,7 +132,7 @@ public class MainActivity extends Activity {
 					}
 					if(temp.indexOf("BATT_TEMP(deci-celsius)") >= 0)
 					{
-						map.put("mapTV", temp.substring(25, temp.length()-1));
+						map.put("temp", temp.substring(25, temp.length()-1));
 					}
 					if(temp.indexOf("is_charging_enabled") >= 0)
 					{
@@ -135,7 +160,16 @@ public class MainActivity extends Activity {
 		return map;
 		
 	}
-
+	
+	View.OnClickListener ImageIntentButtonListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View arg0) {
+			Intent imageIntent = new Intent();
+			imageIntent.setClass(MainActivity.this, ImageActivity.class);
+			startActivity(imageIntent);
+		}
+	};
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
