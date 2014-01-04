@@ -15,7 +15,7 @@ public class LogService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		HashMap<String, String> map = getInfo();
-		//Toast.makeText(getApplicationContext(), map.get("volt"), Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), map.get("volt"), Toast.LENGTH_SHORT).show();
 	}
 	
 	private HashMap<String,String> getInfo() {

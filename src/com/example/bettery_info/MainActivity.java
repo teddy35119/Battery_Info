@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.R.string;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -49,11 +50,10 @@ public class MainActivity extends Activity {
 		viewinit();
 		displayBatteryInfomation(infoListener());    //首次抓取數據 並顯示資訊
 		Timer timer = new Timer();
-		timer.schedule(infomation_updater, 1000,1000);	
+		timer.schedule(infomation_updater, 1000,1000);
+		imageIntentButton.setOnClickListener(ImageIntentButtonListener);
 	}
-	
-	
-	
+		
 	private void viewinit(){   //初始化介面
 		percentTextView = (TextView)findViewById(R.id.textView_info_percent);
 		voltTextView = (TextView)findViewById(R.id.textView_info_volt);
@@ -64,6 +64,7 @@ public class MainActivity extends Activity {
 		imageIntentButton = (Button)findViewById(R.id.button_info_image);
 		bgButton = (Button)findViewById(R.id.button_info_bg);
 	}
+	
 	
 	
 	private void displayBatteryInfomation(HashMap<String,String> battery_infomation){
@@ -159,7 +160,16 @@ public class MainActivity extends Activity {
 		return map;
 		
 	}
-
+	
+	View.OnClickListener ImageIntentButtonListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View arg0) {
+			Intent imageIntent = new Intent();
+			imageIntent.setClass(MainActivity.this, ImageActivity.class);
+			startActivity(imageIntent);
+		}
+	};
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
