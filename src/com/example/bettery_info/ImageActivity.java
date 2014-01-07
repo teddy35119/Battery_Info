@@ -88,24 +88,23 @@ public class ImageActivity extends Activity {
 		CurrentButton = (Button)findViewById(R.id.button_image_current);
 		TempButton = (Button)findViewById(R.id.button_image_temp);
 		linearLayout1= (LinearLayout)findViewById(R.id.LinearLayout1);
-
 	}
 	 // 資料處理
-    private XYMultipleSeriesDataset buildDatset(String[] titles, List<double[]> xValues,
-            List<double[]> yValues) {
+    private XYMultipleSeriesDataset buildDatset(String[] titles, List<ArrayList<Double>> xValues,
+            List<ArrayList<Double>> yValues) {
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 
         int length = titles.length; // 折線數量
         for (int i = 0; i < length; i++) {
             // XYseries對象,用於提供繪製的點集合的資料
             XYSeries series = new XYSeries(titles[i]); // 依據每條線的名稱新增
-            double[] xV = xValues.get(i); // 獲取第i條線的資料
-            double[] yV = yValues.get(i);
-            int seriesLength = xV.length; // 有幾個點
+            ArrayList<Double> xV = xValues.get(i); // 獲取第i條線的資料
+            ArrayList<Double> yV = yValues.get(i);
+            int seriesLength = xV.size(); // 有幾個點
 
             for (int k = 0; k < seriesLength; k++) // 每條線裡有幾個點
             {
-                series.add(xV[k], yV[k]);
+                series.add(xV.get(k), yV.get(k));
             }
             dataset.addSeries(series);
         }
@@ -123,8 +122,12 @@ public class ImageActivity extends Activity {
 	View.OnClickListener ImageListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			double[] x_arr = new double[] { 1,2,3};
-			double[] y_arr = new double[] { 10,20,30};
+			ArrayList<Double> x_arr = new ArrayList<Double>();
+			ArrayList<Double> y_arr = new ArrayList<Double>();
+			Double y_max=0.0;
+			Double y_min=-1.0;
+			Double x_max=0.0;
+			Double x_min=-1.0;
 			//read database
 			Cursor c = InfoSaveLoader.loadInfo(ImageActivity.this);
 			c.moveToFirst();
@@ -133,9 +136,21 @@ public class ImageActivity extends Activity {
 				/*if(v.getId()==R.id.button_image_percent){
 					
 				}*/
+				Double y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.PERCENT));
+				Double x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				
+				if(x>x_max)x_max=x;
+				if(x<x_min || x_min == -1)x_min=x;
+				if(y>y_max)y_max=y;
+				if(y<y_min || y_min == -1)y_min=y;
+				
+				x_arr.add(x);
+				y_arr.add(y);
+				;
+				/*
 				str+="%: ";
 				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.PERCENT));
-				/*str+="   volt: ";
+				str+="   volt: ";
 				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.VOLT));
 				str+="   temp: ";
 				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.TEMP));
@@ -156,8 +171,8 @@ public class ImageActivity extends Activity {
 			//read database done
 			//start
 			String[] titles = new String[] { "折線1"}; // 定義折線的名稱
-	        List<double[]> x = new ArrayList<double[]>(); // 點的x坐標
-	        List<double[]> y = new ArrayList<double[]>(); // 點的y坐標
+	        List<ArrayList<Double>> x = new ArrayList<ArrayList<Double>>(); // 點的x坐標
+	        List<ArrayList<Double>> y = new ArrayList<ArrayList<Double>>(); // 點的y坐標
 	        // 數值X,Y坐標值輸入
 	        x.add(x_arr);
 	        y.add(y_arr);
@@ -167,7 +182,7 @@ public class ImageActivity extends Activity {
 	        PointStyle[] styles = new PointStyle[] { PointStyle.DIAMOND }; // 折線點的形狀
 	        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
 
-	        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", 0, 25, 0, 25, Color.BLACK);// 定義折線圖
+	        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", x_min, x_max, y_min, y_max, Color.BLACK);// 定義折線圖
 	        View chart = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
 	        
 	        linearLayout1.addView(chart); 
