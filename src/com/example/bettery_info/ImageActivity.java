@@ -32,6 +32,7 @@ public class ImageActivity extends Activity {
 	
 	Button BackButton,PercentButton,VoltButton,CurrentButton,TempButton;
 	LinearLayout linearLayout1;
+	View imageView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,9 @@ public class ImageActivity extends Activity {
 		viewinit();
 		BackButton.setOnClickListener(BackButtonListener);
 		PercentButton.setOnClickListener(ImageListener);	
+		VoltButton.setOnClickListener(ImageListener);	
+		CurrentButton.setOnClickListener(ImageListener);	
+		TempButton.setOnClickListener(ImageListener);	
     }
 
     // 定義折線圖名稱
@@ -122,6 +126,12 @@ public class ImageActivity extends Activity {
 	View.OnClickListener ImageListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			//remove first
+			if(imageView!=null){
+				linearLayout1.removeView(imageView);
+				imageView=null;
+			}
+			//start
 			ArrayList<Double> x_arr = new ArrayList<Double>();
 			ArrayList<Double> y_arr = new ArrayList<Double>();
 			Double y_max=0.0;
@@ -133,11 +143,28 @@ public class ImageActivity extends Activity {
 			c.moveToFirst();
 			String str = new String();
 			do{
-				/*if(v.getId()==R.id.button_image_percent){
+				Double y;
+				Double x;
+				if(v.getId()==R.id.button_image_percent){
+					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.PERCENT));
+					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				}else if(v.getId()==R.id.button_image_volt){
+					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.VOLT));
+					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
 					
-				}*/
-				Double y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.PERCENT));
-				Double x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				}else if(v.getId()==R.id.button_image_current){
+					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.CURRENT));
+					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+					
+				}else if(v.getId()==R.id.button_image_temp){
+					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.TEMP));
+					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+					
+				}else{
+					y = Double.valueOf(0);
+					x = Double.valueOf(0);
+				}
+				
 				
 				if(x>x_max)x_max=x;
 				if(x<x_min || x_min == -1)x_min=x;
@@ -183,9 +210,9 @@ public class ImageActivity extends Activity {
 	        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
 
 	        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", x_min, x_max, y_min, y_max, Color.BLACK);// 定義折線圖
-	        View chart = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
+	        imageView = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
 	        
-	        linearLayout1.addView(chart); 
+	        linearLayout1.addView(imageView); 
 	        
 		}
 	};
