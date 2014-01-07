@@ -1,7 +1,10 @@
 package com.example.bettery_info;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -13,6 +16,7 @@ import org.achartengine.chart.PointStyle;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -28,7 +32,6 @@ public class ImageActivity extends Activity {
 	
 	Button BackButton,PercentButton,VoltButton,CurrentButton,TempButton;
 	LinearLayout linearLayout1;
-	View ImageViewImage;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,24 +39,7 @@ public class ImageActivity extends Activity {
 		setContentView(R.layout.activity_image);
 		viewinit();
 		BackButton.setOnClickListener(BackButtonListener);
-		//start
-		String[] titles = new String[] { "折線1"}; // 定義折線的名稱
-        List<double[]> x = new ArrayList<double[]>(); // 點的x坐標
-        List<double[]> y = new ArrayList<double[]>(); // 點的y坐標
-        // 數值X,Y坐標值輸入
-        x.add(new double[] { 1, 3, 5, 7, 9, 11 });
-        y.add(new double[] { 3, 14, 8, 22, 16, 18 });
-        XYMultipleSeriesDataset dataset = buildDatset(titles, x, y); // 儲存座標值
-
-        int[] colors = new int[] { Color.YELLOW };// 折線的顏色
-        PointStyle[] styles = new PointStyle[] { PointStyle.DIAMOND }; // 折線點的形狀
-        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
-
-        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", 0, 12, 0, 25, Color.BLACK);// 定義折線圖
-        View chart = ChartFactory.getLineChartView(this, dataset, renderer);
-        
-       linearLayout1.addView(chart ); 
-        
+		PercentButton.setOnClickListener(ImageListener);	
     }
 
     // 定義折線圖名稱
@@ -102,7 +88,6 @@ public class ImageActivity extends Activity {
 		CurrentButton = (Button)findViewById(R.id.button_image_current);
 		TempButton = (Button)findViewById(R.id.button_image_temp);
 		linearLayout1= (LinearLayout)findViewById(R.id.LinearLayout1);
-		//ImageViewImage = (LinearLayout)findViewById(R.id. view_layout);
 
 	}
 	 // 資料處理
@@ -133,6 +118,60 @@ public class ImageActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			onBackPressed();
+		}
+	};
+	View.OnClickListener ImageListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			double[] x_arr = new double[] { 1,2,3};
+			double[] y_arr = new double[] { 10,20,30};
+			//read database
+			Cursor c = InfoSaveLoader.loadInfo(ImageActivity.this);
+			c.moveToFirst();
+			String str = new String();
+			do{
+				/*if(v.getId()==R.id.button_image_percent){
+					
+				}*/
+				str+="%: ";
+				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.PERCENT));
+				/*str+="   volt: ";
+				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.VOLT));
+				str+="   temp: ";
+				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.TEMP));
+				str+="   current: ";
+				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.CURRENT));
+				str+="   time: ";*/
+				//time format
+				/*int intTime= c.getInt(c.getColumnIndexOrThrow(DBHelper.TIME));
+				Date date = new Date(intTime*1000L); 
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
+				sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+				String formattedDate = sdf.format(date);
+				
+				str+=formattedDate;
+				str+= "\n";*/
+			}while(c.moveToNext());
+			
+			//read database done
+			//start
+			String[] titles = new String[] { "折線1"}; // 定義折線的名稱
+	        List<double[]> x = new ArrayList<double[]>(); // 點的x坐標
+	        List<double[]> y = new ArrayList<double[]>(); // 點的y坐標
+	        // 數值X,Y坐標值輸入
+	        x.add(x_arr);
+	        y.add(y_arr);
+	        XYMultipleSeriesDataset dataset = buildDatset(titles, x, y); // 儲存座標值
+
+	        int[] colors = new int[] { Color.YELLOW };// 折線的顏色
+	        PointStyle[] styles = new PointStyle[] { PointStyle.DIAMOND }; // 折線點的形狀
+	        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
+
+	        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", 0, 25, 0, 25, Color.BLACK);// 定義折線圖
+	        View chart = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
+	        
+	        linearLayout1.addView(chart); 
+	        
 		}
 	};
 	@Override

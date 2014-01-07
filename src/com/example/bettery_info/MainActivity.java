@@ -68,6 +68,11 @@ public class MainActivity extends Activity {
 		USBTextView = (TextView)findViewById(R.id.textView_info_USB);
 		imageIntentButton = (Button)findViewById(R.id.button_info_image);
 		bgButton = (Button)findViewById(R.id.button_info_bg);
+		if(isMyServiceRunning()){
+            bgButton.setText("背景執行-關");
+		}else{
+            bgButton.setText("背景執行-開");
+        }	
 	}
 	
 	
