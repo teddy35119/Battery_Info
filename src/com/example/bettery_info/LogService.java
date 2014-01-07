@@ -20,7 +20,7 @@ public class LogService extends Service {
 	public void onStart(Intent intent, int startId) {
 		//HashMap<String, String> map = getInfo();
 		//Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
-		handler.postDelayed(logInfo, 10000);
+		handler.postDelayed(logInfo, 20000);
 		super.onStart(intent, startId);
 	}
 	@Override
@@ -41,7 +41,7 @@ public class LogService extends Service {
 			InfoSaveLoader.insertInfo(LogService.this, Integer.parseInt(map.get("percent")), Integer.parseInt(map.get("volt")), 
 					Integer.parseInt(map.get("current")), Integer.parseInt(map.get("temp")), (int) (System.currentTimeMillis() / 1000L));
 			Log.d("LogService","Loged");
-			handler.postDelayed(this, 10000);
+			handler.postDelayed(this, 20000);
 		}
 		
 	};

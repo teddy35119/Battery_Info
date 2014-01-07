@@ -15,14 +15,18 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -52,6 +56,7 @@ public class MainActivity extends Activity {
 		Timer timer = new Timer();
 		timer.schedule(infomation_updater, 1000,1000);
 		imageIntentButton.setOnClickListener(ImageIntentButtonListener);
+		bgButton.setOnClickListener(backgroundListener);
 	}
 		
 	private void viewinit(){   //初始化介面
@@ -169,6 +174,35 @@ public class MainActivity extends Activity {
 			startActivity(imageIntent);
 		}
 	};
+	View.OnClickListener backgroundListener = new View.OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			if(isMyServiceRunning()){
+				Intent intent = new Intent(MainActivity.this, LogService.class);
+	            stopService(intent);
+	            Log.d("MainActivity", "Stop Service");
+	            bgButton.setText("背景執行-開");
+	            Toast.makeText(getApplicationContext(), "背景執行已關閉", Toast.LENGTH_SHORT).show();
+			}else{
+				Intent intent = new Intent(MainActivity.this, LogService.class);
+	            startService(intent);
+	            Log.d("MainActivity", "Start Service");
+	            bgButton.setText("背景執行-關");
+	            Toast.makeText(getApplicationContext(), "背景執行已開啟", Toast.LENGTH_SHORT).show();
+			}	
+		}
+	};
+	
+	private boolean isMyServiceRunning() {
+	    ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (LogService.class.getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

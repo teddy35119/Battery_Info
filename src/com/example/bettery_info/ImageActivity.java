@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class ImageActivity extends Activity {
 	
 	Button BackButton,PercentButton,VoltButton,CurrentButton,TempButton;
+	View ImageViewImage;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,25 +29,10 @@ public class ImageActivity extends Activity {
 		VoltButton = (Button)findViewById(R.id.button_image_volt);
 		CurrentButton = (Button)findViewById(R.id.button_image_current);
 		TempButton = (Button)findViewById(R.id.button_image_temp);
+		ImageViewImage = (View)findViewById(R.id.view_image);
 	}
 
-	protected void setChartSettings(XYMultipleSeriesRenderer renderer, String title, String xTitle,
-            String yTitle, double xMin, double xMax, double yMin, double yMax, int axesColor) {
-        renderer.setChartTitle(title); // 折線圖名稱
-        renderer.setChartTitleTextSize(24); // 折線圖名稱字形大小
-        renderer.setXTitle(xTitle); // X軸名稱
-        renderer.setYTitle(yTitle); // Y軸名稱
-        renderer.setXAxisMin(xMin); // X軸顯示最小值
-        renderer.setXAxisMax(xMax); // X軸顯示最大值
-        renderer.setXLabelsColor(Color.BLACK); // X軸線顏色
-        renderer.setYAxisMin(yMin); // Y軸顯示最小值
-        renderer.setYAxisMax(yMax); // Y軸顯示最大值
-        renderer.setAxesColor(axesColor); // 設定坐標軸顏色
-        renderer.setYLabelsColor(0, Color.BLACK); // Y軸線顏色
-        renderer.setLabelsColor(Color.BLACK); // 設定標籤顏色
-        renderer.setMarginsColor(Color.WHITE); // 設定背景顏色
-        renderer.setShowGrid(true); // 設定格線
-    }
+	
 	
 	View.OnClickListener BackButtonListener = new View.OnClickListener() {
 		@Override
