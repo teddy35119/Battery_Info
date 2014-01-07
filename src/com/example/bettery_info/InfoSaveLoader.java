@@ -47,7 +47,8 @@ public class InfoSaveLoader {
 			    null,                            // The values for the WHERE clause
 			    null,                                     // don't group the rows
 			    null,                                     // don't filter by row groups
-			    sortOrder                                 // The sort order
+			    sortOrder,                                 // The sort order
+			    "10"
 			    );
 		return c;
 	}
