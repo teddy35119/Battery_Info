@@ -23,7 +23,7 @@ public class InfoSaveLoader {
 		         values);
 		return newRowId;
 	}
-	public static Cursor loadInfo(Context context){
+	public static Cursor loadInfo(Context context,int how){
 		DBHelper mDbHelper = new DBHelper(context);
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		
@@ -48,7 +48,7 @@ public class InfoSaveLoader {
 			    null,                                     // don't group the rows
 			    null,                                     // don't filter by row groups
 			    sortOrder,                                 // The sort order
-			    "10"
+			    String.valueOf(how)
 			    );
 		return c;
 	}

@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -31,8 +33,23 @@ import android.widget.Toast;
 public class ImageActivity extends Activity {
 	
 	Button BackButton,PercentButton,VoltButton,CurrentButton,TempButton;
+	Button plusButton,minusButton;
 	LinearLayout linearLayout1;
+	int image_status, get_howmany_dot;
 	View imageView;
+	
+	//Timer設置
+	TimerTask image_updater = new TimerTask(){
+		@Override
+		public void run() {
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					displayinfo();
+				}
+			});
+		}		
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +60,14 @@ public class ImageActivity extends Activity {
 		PercentButton.setOnClickListener(ImageListener);	
 		VoltButton.setOnClickListener(ImageListener);	
 		CurrentButton.setOnClickListener(ImageListener);	
-		TempButton.setOnClickListener(ImageListener);	
+		TempButton.setOnClickListener(ImageListener);
+		plusButton.setOnClickListener(sizeListener);
+		minusButton.setOnClickListener(sizeListener);
+		image_status = R.id.button_image_percent;
+		get_howmany_dot = 15;
+		displayinfo();
+		Timer timer = new Timer();
+		timer.schedule(image_updater, 1000,1000);
     }
 
     // 定義折線圖名稱
@@ -91,7 +115,10 @@ public class ImageActivity extends Activity {
 		VoltButton = (Button)findViewById(R.id.button_image_volt);
 		CurrentButton = (Button)findViewById(R.id.button_image_current);
 		TempButton = (Button)findViewById(R.id.button_image_temp);
+		plusButton = (Button)findViewById(R.id.button_image_plus);
+		minusButton = (Button)findViewById(R.id.button_image_minus);
 		linearLayout1= (LinearLayout)findViewById(R.id.LinearLayout1);
+		
 	}
 	 // 資料處理
     private XYMultipleSeriesDataset buildDatset(String[] titles, List<ArrayList<Double>> xValues,
@@ -126,96 +153,110 @@ public class ImageActivity extends Activity {
 	View.OnClickListener ImageListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			//remove first
-			if(imageView!=null){
-				linearLayout1.removeView(imageView);
-				imageView=null;
-			}
-			//start
-			ArrayList<Double> x_arr = new ArrayList<Double>();
-			ArrayList<Double> y_arr = new ArrayList<Double>();
-			Double y_max=0.0;
-			Double y_min=-1.0;
-			Double x_max=0.0;
-			Double x_min=-1.0;
-			//read database
-			Cursor c = InfoSaveLoader.loadInfo(ImageActivity.this);
-			c.moveToFirst();
-			String str = new String();
-			do{
-				Double y;
-				Double x;
-				if(v.getId()==R.id.button_image_percent){
-					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.PERCENT));
-					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
-				}else if(v.getId()==R.id.button_image_volt){
-					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.VOLT));
-					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
-					
-				}else if(v.getId()==R.id.button_image_current){
-					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.CURRENT));
-					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
-					
-				}else if(v.getId()==R.id.button_image_temp){
-					y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.TEMP));
-					x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
-					
-				}else{
-					y = Double.valueOf(0);
-					x = Double.valueOf(0);
-				}
-				
-				
-				if(x>x_max)x_max=x;
-				if(x<x_min || x_min == -1)x_min=x;
-				if(y>y_max)y_max=y;
-				if(y<y_min || y_min == -1)y_min=y;
-				
-				x_arr.add(x);
-				y_arr.add(y);
-				;
-				/*
-				str+="%: ";
-				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.PERCENT));
-				str+="   volt: ";
-				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.VOLT));
-				str+="   temp: ";
-				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.TEMP));
-				str+="   current: ";
-				str+= c.getInt(c.getColumnIndexOrThrow(DBHelper.CURRENT));
-				str+="   time: ";*/
-				//time format
-				/*int intTime= c.getInt(c.getColumnIndexOrThrow(DBHelper.TIME));
-				Date date = new Date(intTime*1000L); 
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
-				sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-				String formattedDate = sdf.format(date);
-				
-				str+=formattedDate;
-				str+= "\n";*/
-			}while(c.moveToNext());
-			
-			//read database done
-			//start
-			String[] titles = new String[] { "折線1"}; // 定義折線的名稱
-	        List<ArrayList<Double>> x = new ArrayList<ArrayList<Double>>(); // 點的x坐標
-	        List<ArrayList<Double>> y = new ArrayList<ArrayList<Double>>(); // 點的y坐標
-	        // 數值X,Y坐標值輸入
-	        x.add(x_arr);
-	        y.add(y_arr);
-	        XYMultipleSeriesDataset dataset = buildDatset(titles, x, y); // 儲存座標值
-
-	        int[] colors = new int[] { Color.YELLOW };// 折線的顏色
-	        PointStyle[] styles = new PointStyle[] { PointStyle.DIAMOND }; // 折線點的形狀
-	        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
-
-	        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", x_min, x_max, y_min, y_max, Color.BLACK);// 定義折線圖
-	        imageView = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
-	        
-	        linearLayout1.addView(imageView); 
-	        
+			image_status=v.getId();
+	        displayinfo();
 		}
 	};
+	
+	View.OnClickListener sizeListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(v.getId()==R.id.button_image_plus && get_howmany_dot < 100){
+				get_howmany_dot+=10;
+			}else if(v.getId()==R.id.button_image_minus && get_howmany_dot > 10){
+				get_howmany_dot-=10;
+			}
+	        displayinfo();
+		}
+	};
+	
+	
+	private void displayinfo(){
+		//remove first
+		if(imageView!=null){
+			linearLayout1.removeView(imageView);
+			imageView=null;
+		}
+		//start
+		ArrayList<Double> x_arr = new ArrayList<Double>();
+		ArrayList<Double> y_arr = new ArrayList<Double>();
+		Double y_max=0.0;
+		Double y_min=-1.0;
+		Double x_max=0.0;
+		Double x_min=-1.0;
+		//read database
+		Cursor c = InfoSaveLoader.loadInfo(ImageActivity.this,get_howmany_dot);
+		c.moveToFirst();
+		do{
+			Double y;
+			Double x;
+			if(image_status==R.id.button_image_percent){
+				y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.PERCENT));
+				x= c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+			}else if(image_status==R.id.button_image_volt){
+				y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.VOLT));
+				y/=1000;
+				x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				
+			}else if(image_status==R.id.button_image_current){
+				y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.CURRENT));
+				y/=1000;
+				x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				
+			}else if(image_status==R.id.button_image_temp){
+				y= c.getDouble(c.getColumnIndexOrThrow(DBHelper.TEMP));
+				y/=10;
+				x=c.getDouble(c.getColumnIndexOrThrow(DBHelper.TIME));
+				
+			}else{
+				y = Double.valueOf(0);
+				x = Double.valueOf(0);
+			}
+			
+			
+			if(x>x_max)x_max=x;
+			if(x<x_min || x_min == -1)x_min=x;
+			if(y>y_max)y_max=y;
+			if(y<y_min || y_min == -1)y_min=y;
+			
+			x_arr.add(x);
+			y_arr.add(y);
+		}while(c.moveToNext());
+		
+		//read database done
+		//start
+		String[] titles; // 定義折線的名稱
+		if(image_status==R.id.button_image_percent){
+			titles = new String[] { "電池電量"};
+			y_max=100.0;
+			y_min=0.0;
+		}else if(image_status==R.id.button_image_volt){
+			titles = new String[] { "電池電壓"};
+		}else if(image_status==R.id.button_image_current){
+			titles = new String[] { "電池電流"};
+		}else if(image_status==R.id.button_image_temp){
+			titles = new String[] { "電池溫度"};
+		}else{
+			titles = new String[] { "出了點問題....抓不到拉:P"};
+		}
+		
+        List<ArrayList<Double>> x = new ArrayList<ArrayList<Double>>(); // 點的x坐標
+        List<ArrayList<Double>> y = new ArrayList<ArrayList<Double>>(); // 點的y坐標
+        // 數值X,Y坐標值輸入
+        x.add(x_arr);
+        y.add(y_arr);
+        XYMultipleSeriesDataset dataset = buildDatset(titles, x, y); // 儲存座標值
+
+        int[] colors = new int[] { Color.YELLOW };// 折線的顏色
+        PointStyle[] styles = new PointStyle[] { PointStyle.DIAMOND }; // 折線點的形狀
+        XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, true);
+
+        setChartSettings(renderer, "折線圖展示", "X軸名稱", "Y軸名稱", x_min, x_max, y_min, y_max, Color.BLACK);// 定義折線圖
+        imageView = ChartFactory.getLineChartView(ImageActivity.this, dataset, renderer);
+        
+        linearLayout1.addView(imageView); 
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

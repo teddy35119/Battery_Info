@@ -42,7 +42,6 @@ public class MainActivity extends Activity {
 				public void run() {
 					displayBatteryInfomation(infoListener());    //
 				}
-				
 			});
 		}		
 	};
