@@ -5,26 +5,34 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 
-public class DBHelper extends SQLiteOpenHelper {
+public class DBHelper extends SQLiteOpenHelper   implements BaseColumns{
 	private static final int DATABASE_VERSION = 1;
-	private static final String DATABASE_NAME="battery";
-    private static final String BATTERY_TABLE_NAME = "battery";
-    private static final String BATTERY_TABLE_CREATE =
-                "CREATE TABLE " + BATTERY_TABLE_NAME + " (_id INTEGER PRIMARY KEY, percent INTEGER, volt INTEGER, current INTEGER, temp INTEGER, time DATETIME);";
+	private static final String DATABASE_NAME="battery.db";
+    public static final String TABLE_NAME = "battery";
+    public static final String INFO_ID = "_id";
+    public static final String PERCENT="percent";
+    public static final String VOLT="volt";
+    public static final String CURRENT="current";
+    public static final String TEMP="temp";
+    public static final String TIME="time";
+    private static final String TABLE_CREATE =
+                	"CREATE TABLE " + TABLE_NAME + " (" +
+                	INFO_ID + " INTEGER PRIMARY KEY, " +
+                	PERCENT + " INTEGER, " +
+                	VOLT + " INTEGER, " + 
+                	CURRENT + " INTEGER, " + 
+                	TEMP + " INTEGER, " +
+                	TIME + " DATETIME);";
 
-	  public DBHelper(Context context, String name, CursorFactory factory, int version) {
+	  public DBHelper(Context context) {
 		  super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
-	  
-	 public void insertData(int percent, int volt, int current, int temp, Calendar time){
-		 
-	 }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(BATTERY_TABLE_CREATE);
+        db.execSQL(TABLE_CREATE);
     }
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {

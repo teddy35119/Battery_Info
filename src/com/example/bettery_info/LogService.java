@@ -3,20 +3,49 @@ package com.example.bettery_info;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.sql.Date;
 import java.util.HashMap;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 public class LogService extends Service {
-
+	private Handler handler = new Handler();
+	
 	@Override
 	public void onStart(Intent intent, int startId) {
-		HashMap<String, String> map = getInfo();
-		Toast.makeText(getApplicationContext(), map.get("volt"), Toast.LENGTH_SHORT).show();
+		//HashMap<String, String> map = getInfo();
+		//Toast.makeText(getApplicationContext(), "start", Toast.LENGTH_SHORT).show();
+		handler.postDelayed(logInfo, 10000);
+		super.onStart(intent, startId);
 	}
+	@Override
+	public void onDestroy(){
+		handler.removeCallbacks(logInfo);
+	}
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+	
+	private Runnable logInfo = new Runnable(){
+		@Override
+		public void run() {
+			//Log.i("time:", new Date(0).toString());
+			HashMap<String,String> map = getInfo();
+			InfoSaveLoader.insertInfo(LogService.this, Integer.parseInt(map.get("percent")), Integer.parseInt(map.get("volt")), 
+					Integer.parseInt(map.get("current")), Integer.parseInt(map.get("temp")), (int) (System.currentTimeMillis() / 1000L));
+			Log.d("LogService","Loged");
+			handler.postDelayed(this, 10000);
+		}
+		
+	};
+
 	
 	private HashMap<String,String> getInfo() {
 		HashMap<String,String> map = new HashMap<String,String>();
@@ -76,11 +105,5 @@ public class LogService extends Service {
 		return map;
 		
 	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }
