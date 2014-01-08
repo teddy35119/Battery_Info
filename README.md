@@ -5,4 +5,5 @@ Bettery_Info
 Only for HTC Butterfly
 
 內有使用到背景執行、資料庫存取、繪製圖表
+
 有興趣的人可以參考參考 :D
